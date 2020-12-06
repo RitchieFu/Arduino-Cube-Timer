@@ -1,6 +1,7 @@
 const int trigPin = 12;         
 const int echoPin = 13;
 const int speakerPin =  10;
+const int switchPin = 7;   
 const int redLED = 8;
 const int greenLED = 9;
 const int yellowButton = 5;
@@ -12,6 +13,7 @@ void setup() {
   pinMode(trigPin, OUTPUT);  
   pinMode(echoPin, INPUT);
   pinMode(speakerPin, OUTPUT);
+  pinMode(switchPin, INPUT_PULLUP);
   pinMode(redLED, OUTPUT);
   pinMode(greenLED, OUTPUT);
   pinMode(yellowButton, INPUT_PULLUP);
@@ -50,7 +52,10 @@ void loop() {
         Serial.println(elapsed_time);
         idle = true;
         reset = false;
-        tone(speakerPin, 247, 100);
+        
+        if (digitalRead(7)== LOW) {
+          tone(speakerPin, 247, 100);
+        }
         digitalWrite(redLED, HIGH);
         delay(100);
         digitalWrite(redLED, LOW);
@@ -59,8 +64,8 @@ void loop() {
       held_time += 100;
       if (held_time >= 500) {
         digitalWrite(greenLED, HIGH);
-        if (held_time == 500) {
-          tone(speakerPin, 294, 100);
+        if (held_time == 500 && digitalRead(7) == LOW) {
+            tone(speakerPin, 294, 100);
         }
       }
     }
@@ -68,14 +73,11 @@ void loop() {
       digitalWrite(redLED, LOW);
       digitalWrite(greenLED, LOW);
       if (millis() - trigger_time < 500) {
-  //      Serial.println("too fast");
         held_time = 0;
         armed = false;
         idle = true;
       }
-  
       else if (idle == false and armed == true) {
-//        Serial.println("start");
         start_time = millis();
         armed = false;
       }
@@ -83,7 +85,6 @@ void loop() {
   }
   delay(100);
 }
-
 
 float getDistance()
 {
